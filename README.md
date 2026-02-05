@@ -1,1 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手游福利导航 - 最新折扣与礼包</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "微软雅黑", sans-serif; }
+        body { background-color: #f5f7fa; padding: 20px; }
+        .header { background-color: #2c3e50; color: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; text-align: center; }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.8; }
+        .notice { background-color: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; }
+        .game-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .game-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .game-card h3 { color: #2c3e50; font-size: 18px; margin-bottom: 10px; }
+        .game-tag { display: inline-block; background: #3498db; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-bottom: 12px; }
+        .game-benefit { font-size: 14px; color: #666; margin-bottom: 15px; line-height: 1.5; }
+        .game-link { display: inline-block; background: #e74c3c; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-size: 14px; transition: background 0.3s; }
+        .game-link:hover { background: #c0392b; }
+        .footer { text-align: center; margin-top: 40px; font-size: 12px; color: #999; }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <div class="header">
+        <h1>手游福利导航平台</h1>
+        <p>实时更新折扣手游、专属礼包、代金券福利</p >
+    </div>
 
+    <!-- 声明提示 -->
+    <div class="notice">
+        ⚠️ 本平台仅提供官方授权手游导航，非游戏盒子/换皮游戏，所有福利以游戏内实际到账为准
+    </div>
+
+    <!-- 手游列表 -->
+    <div class="game-list">
+        <!-- 游戏卡片1：替换括号内内容即可 -->
+        <div class="game-card">
+            <h3>【游戏名称1】</h3>
+            <span class="game-tag">5折优惠</span>
+            <p class="game-benefit">福利：新手代金券50元+专属钻石礼包+登录送SSR</p >
+            <a href=" " class="game-link" target="_blank">立即领取福利</a >
+        </div>
+
+        <!-- 游戏卡片2 -->
+        <div class="game-card">
+            <h3>【游戏名称2】</h3>
+            <span class="game-tag">首充翻倍</span>
+            <p class="game-benefit">福利：首充6元得2000元宝+绝版皮肤+3日登录奖励</p >
+            <a href="【游戏官方跳转链接2】" class="game-link" target="_blank">立即领取福利</a >
+        </div>
+
+        <!-- 游戏卡片3 -->
+        <div class="game-card">
+            <h3>【游戏名称3】</h3>
+            <span class="game-tag">专属礼包</span>
+            <p class="game-benefit">福利：导航专属兑换码+100万金币+高级装备宝箱</p >
+            <a href="【游戏官方跳转链接3】" class="game-link" target="_blank">立即领取福利</a >
+        </div>
+    </div>
+
+    <!-- 底部声明 -->
+    <div class="footer">
+        版权所有 © 2024 手游福利导航 | 本站不提供游戏下载，仅做导航指引
+    </div>
+
+    <!-- 一键收藏功能（手机/电脑通用） -->
+    <script>
+        function addToFavorites() {
+            var url = window.location.href;
+            var title = document.title;
+            try {
+                window.external.AddFavorite(url, title);
+            } catch (e) {
+                try {
+                    window.sidebar.addPanel(title, url, "");
+                } catch (e) {
+                    alert("请手动收藏本页面：\n1. 点击浏览器右上角三个点\n2. 选择「收藏」或「添加到书签」");
+                }
+            }
+        }
+        // 页面加载完成后提示收藏
+        window.onload = function() {
+            setTimeout(() => {
+                if(confirm("是否收藏本手游福利导航页？后续可直接查看最新福利~")) {
+                    addToFavorites();
+                }
+            }, 3000);
+        };
+    </script>
+</body>
+</html>
