@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>我的游戏导航中心</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2317140f'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='16' font-weight='900' fill='%23ff5a1f' text-anchor='middle'%3EG%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --paper:#ffffff; --paper-2:#fafafa; --paper-3:#eeeeee;
+  --ink:#17140f; --ink-2:#5d564b; --ink-3:#8b8375;
+  --line:rgba(23,20,15,.13); --line-strong:rgba(23,20,15,.85);
+  --accent:#ff5a1f; --fresh:#c8f03c;
+  --font:"PingFang SC","HarmonyOS Sans SC","MiSans","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  --gutter:16px; --max:1120px;
+}
+html.dark-mode{
+  --paper:#121110; --paper-2:#1b1a17; --paper-3:#26241f;
+  --ink:#f2ede3; --ink-2:#b1a999; --ink-3:#7f786b;
+  --line:rgba(242,237,227,.12); --line-strong:rgba(242,237,227,.8);
+  --accent:#ff6a33;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;background:var(--paper);color:var(--ink);
+  font-family:var(--font);font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:calc(80px + env(safe-area-inset-bottom));
+}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.07;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+body>*{position:relative;z-index:1}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+.wrap{width:100%;max-width:var(--max);margin:0 auto;padding:0 var(--gutter)}
+
+/* ---------- 顶栏 ---------- */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:calc(14px + env(safe-area-inset-top));padding-bottom:14px}
+.brand{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+.brand-mark{width:22px;height:22px;display:grid;place-items:center;background:var(--ink);color:var(--paper);border-radius:6px;font-size:12px}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.tabs{display:inline-flex;padding:3px;border:1.5px solid var(--line-strong);border-radius:999px;gap:2px}
+.tabs a{font-size:13px;font-weight:700;padding:5px 12px;border-radius:999px;color:var(--ink-2);cursor:pointer}
+.tabs a[aria-current="page"]{background:var(--ink);color:var(--paper)}
+.icon-btn{width:38px;height:38px;display:grid;place-items:center;border-radius:999px;border:1.5px solid var(--line-strong);background:transparent;color:var(--ink);cursor:pointer}
+.icon-btn svg{width:18px;height:18px}
+
+/* ---------- 首页标题区 ---------- */
+.hero{padding:18px 0 8px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);margin:0 0 12px}
+.eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px rgba(255,90,31,.22)}
+.app-title{margin:0;font-size:clamp(40px,12vw,80px);line-height:.98;font-weight:900;letter-spacing:-.035em}
+.app-title .hl{position:relative;white-space:nowrap}
+.app-title .hl svg{position:absolute;left:-2%;bottom:-.08em;width:104%;height:.3em;overflow:visible}
+.app-title .hl path{fill:none;stroke:var(--accent);stroke-width:9;stroke-linecap:round}
+.app-subtitle{margin:14px 0 0;max-width:34em;color:var(--ink-2);font-size:15px}
+.hero-side{text-align:right;font-size:13px;color:var(--ink-2);line-height:1.7;display:none}
+.hero-side strong{display:block;font-size:60px;line-height:1;color:var(--ink);font-weight:900;letter-spacing:-.04em}
+
+/* ---------- 跑马灯 ---------- */
+.ticker{margin:22px 0;border-top:1.5px solid var(--line-strong);border-bottom:1.5px solid var(--line-strong);background:var(--ink);color:var(--paper);overflow:hidden;white-space:nowrap;font-size:13px;font-weight:700;max-width:100vw}
+.ticker-track{display:inline-flex;padding:9px 0;animation:marquee 30s linear infinite}
+.ticker-track span{display:inline-flex;align-items:center;gap:18px;padding-right:18px}
+.ticker-track b{color:var(--fresh);font-weight:800;font-family:var(--mono)}
+.ticker-track i{font-style:normal;color:var(--accent)}
+@keyframes marquee{to{transform:translateX(-50%)}}
+
+/* ---------- 搜索 ---------- */
+.container{padding-top:22px}
+.search-field{display:flex;align-items:center;border:1.5px solid var(--line-strong);border-radius:14px;background:var(--paper-2);position:relative}
+.search-field:focus-within{box-shadow:4px 4px 0 var(--ink)}
+.search-field input{width:100%;height:50px;border:0;background:transparent;padding:0 16px;font-family:var(--font);font-size:16px;color:var(--ink);outline:none;-webkit-appearance:none}
+.search-field input::placeholder{color:var(--ink-3)}
+.search-count{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--ink-2);padding:14px 2px 6px}
+.search-count::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* ---------- 游戏清单 ---------- */
+.game-list{list-style:none;margin:0;padding:0;counter-reset:rank}
+.game-item{position:relative;display:grid;grid-template-columns:30px 60px minmax(0,1fr) auto;align-items:center;gap:0 12px;padding:14px 6px 14px 0;border-bottom:1.5px dashed var(--line);counter-increment:rank;cursor:pointer}
+.game-item::before{content:counter(rank,decimal-leading-zero);font-family:var(--mono);font-size:13px;font-weight:800;color:var(--ink-3);text-align:right}
+.game-item:nth-child(-n+3)::before{color:var(--accent)}
+.game-icon-wrap{position:relative;width:60px;height:60px;border-radius:16px;border:1.5px solid var(--line-strong);background:var(--paper-3);overflow:hidden;display:grid;place-items:center;font-weight:900;font-size:22px;color:var(--ink)}
+.game-icon-wrap img{width:100%;height:100%;object-fit:cover}
+.game-item.is-fresh .game-icon-wrap::after{content:"NEW";position:absolute;top:-7px;right:-9px;background:var(--fresh);color:#17140f;font-family:var(--mono);font-size:9.5px;font-weight:900;padding:2px 5px;border-radius:5px;border:1.5px solid var(--ink);transform:rotate(8deg)}
+.game-info{min-width:0}
+.game-title{margin:0;font-size:16.5px;font-weight:800;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.game-desc{margin:2px 0 0;font-size:13px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.game-meta{margin-top:5px;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink-3)}
+.game-item.is-fresh .game-meta::before{content:"● ";color:var(--accent)}
+.btn-play{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px 0 14px;border-radius:10px;background:var(--ink);color:var(--paper);font-size:13.5px;font-weight:800;white-space:nowrap;transition:background-color .12s;position:relative}
+.btn-play::after{content:"";width:7px;height:7px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);margin-left:1px}
+@media (hover:hover){
+  .game-item:hover{background:var(--paper-2)}
+  .game-item:hover .game-icon-wrap{transform:rotate(-4deg) scale(1.04)}
+  .game-item:hover .btn-play{background:var(--accent);color:#fff}
+}
+.empty{display:none;text-align:center;padding:40px 20px;border:1.5px dashed var(--line-strong);border-radius:18px;color:var(--ink-2)}
+
+/* ================= 详情页 ================= */
+.view{display:none}
+.view.active{display:block}
+
+.back-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:1.5px solid var(--line-strong);color:var(--ink);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;margin:10px 0 6px;font-family:var(--font)}
+.back-btn svg{width:16px;height:16px}
+
+.detail-head{display:flex;gap:16px;align-items:center;padding:14px 0 20px}
+.detail-icon{width:76px;height:76px;border-radius:18px;border:1.5px solid var(--line-strong);background:var(--paper-3);display:grid;place-items:center;font-weight:900;font-size:30px;flex-shrink:0;overflow:hidden}
+.detail-icon img{width:100%;height:100%;object-fit:cover}
+.detail-name{margin:0;font-size:24px;font-weight:900;letter-spacing:-.02em;line-height:1.15}
+.detail-meta{margin-top:6px;font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+
+/* 警告提示框 */
+.notice{display:flex;gap:12px;align-items:flex-start;border:1.5px dashed var(--accent);border-radius:14px;padding:14px 16px;background:rgba(255,90,31,.06);margin:8px 0 20px}
+.notice svg{width:22px;height:22px;color:var(--accent);flex-shrink:0;margin-top:1px}
+.notice strong{display:block;font-size:14.5px;font-weight:800;margin-bottom:2px}
+.notice span{font-size:13px;color:var(--ink-2)}
+
+/* 礼包码 */
+.reward-card{border:1.5px solid var(--line-strong);border-radius:14px;background:var(--paper-2);padding:16px;margin-bottom:24px}
+.reward-label{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px}
+.reward-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.reward-code{font-family:var(--mono);font-size:22px;font-weight:800;letter-spacing:.06em;color:var(--ink);background:var(--paper-3);padding:8px 14px;border-radius:10px;border:1.5px solid var(--line-strong)}
+.copy-btn{height:38px;padding:0 14px;border:0;border-radius:10px;background:var(--ink);color:var(--paper);font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font)}
+.copy-btn.copied{background:var(--fresh);color:#17140f}
+
+/* 步骤 */
+.steps-title{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);margin:0 0 14px;display:flex;align-items:center;gap:8px}
+.steps-title::after{content:"";flex:1;height:1px;background:var(--line)}
+/* 步骤手风琴（可折叠卡片） */
+.steps-title{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);margin:0 0 14px;display:flex;align-items:center;gap:8px}
+.steps-title::after{content:"";flex:1;height:1px;background:var(--line)}
+.step-card{background:var(--paper-2);border:1.5px solid var(--line-strong);border-radius:14px;overflow:hidden;margin-bottom:10px;transition:box-shadow .2s,border-color .2s}
+.step-card:hover{border-color:var(--accent)}
+.step-card.active{border-color:var(--accent);box-shadow:3px 3px 0 var(--ink)}
+.card-header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 18px;cursor:pointer;user-select:none}
+.header-title{display:flex;align-items:center;gap:10px;font-size:15.5px;font-weight:800}
+.step-badge{background:var(--accent);color:#fff;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;flex-shrink:0;letter-spacing:.02em}
+.arrow-icon{width:11px;height:11px;border-right:2px solid var(--ink-3);border-bottom:2px solid var(--ink-3);transform:rotate(45deg);transition:transform .3s ease,border-color .3s;flex-shrink:0;margin-right:6px}
+.step-card.active .arrow-icon{transform:rotate(225deg);border-color:var(--accent)}
+.card-content{max-height:0;overflow:hidden;transition:max-height .38s ease-out;background:rgba(0,0,0,.02)}
+.content-inner{padding:0 18px 18px}
+.content-inner p{margin:0;font-size:14px;color:var(--ink-2);line-height:1.7}
+.step-link{display:block;margin-top:10px;font-family:var(--mono);font-size:13px;font-weight:800;color:var(--accent);border:1.5px solid var(--accent);border-radius:10px;padding:10px 14px;transition:background-color .15s,color .15s;text-align:center}
+.step-link:hover{background:var(--accent);color:#fff}
+/* 步骤内的礼包码列表 */
+.reward-list{margin-top:14px;border-top:1.5px dashed var(--line);padding-top:14px;display:flex;flex-direction:column;gap:10px}
+.reward-item{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.reward-code-btn{font-family:var(--mono);font-size:14px;font-weight:800;letter-spacing:.04em;background:var(--ink);color:var(--paper);border:1.5px solid var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer;transition:background-color .15s,color .15s;font-family:var(--mono)}
+.reward-code-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.reward-code-btn.copied{background:var(--fresh);border-color:var(--fresh);color:#17140f}
+.reward-desc{font-size:13px;color:var(--ink-2)}
+html.dark-mode .card-content{background:rgba(255,255,255,.03)}
+
+/* 开始大按钮 */
+.start-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:56px;border:0;border-radius:14px;background:var(--accent);color:#fff;font-size:17px;font-weight:900;cursor:pointer;margin-top:24px;box-shadow:4px 4px 0 var(--ink);font-family:var(--font)}
+.start-btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.detail-tip{text-align:center;font-size:12px;color:var(--ink-3);margin-top:14px}
+
+/* ---------- 页脚 ---------- */
+.site-footer{margin-top:48px;padding-bottom:24px}
+.footer-word{font-size:clamp(44px,16vw,130px);font-weight:900;line-height:.9;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1.5px var(--line-strong);white-space:nowrap;overflow:hidden;text-align:center}
+.footer-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin-top:14px;padding-top:14px;border-top:1.5px solid var(--line-strong);font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+
+/* ---------- 右下按钮 ---------- */
+.dock{position:fixed;right:16px;bottom:16px;z-index:50}
+.dock button{width:46px;height:46px;display:grid;place-items:center;border-radius:14px;border:1.5px solid var(--ink);background:var(--paper-2);color:var(--ink);cursor:pointer;box-shadow:3px 3px 0 var(--ink)}
+
+@media (min-width:760px){
+  :root{--gutter:32px}
+  body{font-size:16px}
+  .topbar{padding-top:22px}
+  .hero{display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px}
+  .hero-side{display:block}
+  .game-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:40px;margin-top:16px}
+  .game-item{grid-template-columns:32px 64px minmax(0,1fr) auto;padding:18px 10px 18px 0}
+  .game-icon-wrap{width:64px;height:64px}
+  .detail-body{max-width:680px;margin:0 auto}
+}
+@media (prefers-reduced-motion:reduce){.ticker-track{animation:none}}
+</style>
+</head>
+<body id="top">
+
+<div class="wrap">
+  <header class="topbar">
+    <a class="brand" href="#/" id="brandLink">
+      <span class="brand-mark">G</span>
+      <span class="brand-text">Game Hub</span>
+    </a>
+    <div class="topbar-right">
+      <nav class="tabs">
+        <a href="#/" aria-current="page">首页</a>
+        <a href="#/" id="tabCodes">礼包码</a>
+      </nav>
+      <button class="icon-btn" id="themeBtn" title="切换深浅色">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+    </div>
+  </header>
+</div>
+
+<!-- ============ 视图一：首页 ============ -->
+<div class="view active" id="viewHome">
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <p class="eyebrow"><span class="dot"></span> Daily Gift Codes</p>
+        <h1 class="app-title">游戏导航<span class="hl">中心<svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M2 8 Q100 2 198 7"/></svg></span></h1>
+        <p class="app-subtitle">精选热门手游的礼包码、注册教学与下载链接，跟着步骤操作，一键领取。</p>
+      </div>
+      <div class="hero-side"><strong id="totalNum">0</strong>款游戏</div>
+    </section>
+  </div>
+
+  <div class="ticker"><div class="ticker-track" id="tickerTrack"></div></div>
+
+  <div class="wrap container">
+    <div class="search-field"><input type="text" id="searchInput" placeholder="搜索游戏名称…"></div>
+    <div class="search-count"><span id="countText">共 0 款游戏</span></div>
+    <ul class="game-list" id="gameList"></ul>
+    <div class="empty" id="emptyBox">没有找到匹配的游戏</div>
+  </div>
+</div>
+
+<!-- ============ 视图二：游戏详情页（点游戏卡片进入） ============ -->
+<div class="view" id="viewDetail">
+  <div class="wrap detail-body">
+    <button class="back-btn" id="backBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>
+      返回列表
+    </button>
+
+    <div class="detail-head">
+      <div class="detail-icon" id="dIcon"></div>
+      <div>
+        <h1 class="detail-name" id="dName"></h1>
+        <div class="detail-meta" id="dMeta"></div>
+      </div>
+    </div>
+
+    <div class="notice">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg>
+      <div><strong>严格按照步骤操作</strong><span>每一步都按下面顺序做，才能成功领到礼包。</span></div>
+    </div>
+
+    <p class="steps-title">操作步骤</p>
+    <div id="dSteps"></div>
+
+    <a class="start-btn" id="dStart" target="_blank" rel="noopener">点击进群领取更多礼包 →</a>
+    <p class="detail-tip">点击按钮进入交流群，领取更多独家礼包</p>
+  </div>
+</div>
+
+<footer class="site-footer wrap">
+  <div class="footer-word">PLAY GAME</div>
+  <div class="footer-meta"><span>© 2026 你的站名</span><span>每日更新</span></div>
+</footer>
+
+<div class="dock">
+  <button id="topBtn" title="回到顶部"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+</div>
+
+<script>
+/* ============================================================
+   ★★★ 你只需要改这里！★★★
+   每个游戏一个大括号 { }，里面现在包含：
+   ------------------------------------------------------------
+   title    : 游戏名
+   desc     : 列表上那行小字
+   meta     : 更新时间
+   fresh    : true=显示绿色NEW标，false=不显示
+   reward   : 详情页里的礼包码（没有就写 ""）
+   startUrl : 点"立即开始"打开的网址
+   steps    : 操作步骤，每步是一个 { t:"步骤标题", d:"步骤说明" }
+   icon     : （可选）放你自己的图片文件名
+   ============================================================ */
+const GAMES = [
+  {
+    title:"次神光之觉醒", desc:"严格按照步骤操作", meta:"1 天前更新",fresh:false,
+    icon:"1.jpg",
+    rewards:[
+      { code:"VIP000", desc:"星钻1w、宝石100W、纪念卡卷1000、加冕王冠10000、经验水晶3W、星羽铸币3W、纯银锻造锤3000、黄金锻造锤1500、星尘500、星辰碎片500" },
+      { code:"店铺好评大礼包", desc:"灵之契约200W、灵纹刻印5W、坐骑守护石60W、坐骑刻印石60W、随机ss角色箱30、自选ss角色碎片500、次神号1、已蛇1、雪橇1、阳光彩虹小白马1、龙舟1、淘气彩云1" },
+    ],
+    groupUrl:"https://qm.qq.com/q/KMuMc45vGY",
+    steps:[
+      { t:"注册账号", d:"点下面的按钮「注册账号记得保存以免忘记哦」。", url:"http://139.224.228.155:8312/mobile/Downfile/index?gid=1&pid=185&template=1", urlText:"注册链接【点击进入】" },
+      { t:"下载游戏", d:"根据你的手机型号，下载对应版本的安装包并安装。", url:"https://pop.hy-votes.work/Oe5T", urlText:"苹果/安卓下载地址【点击进入】" },
+      { t:"礼包码兑换", d:"进入游戏后，在【头像-兑换码】里把下面的兑换码依次复制粘贴进去。" },
+      { t:"游戏充值礼包", d:"点击下面链接进入充值中心，领取专属充值返利礼包。", urls:[
+        { url:"http://43.203.187.82:8199", urlText:"充值礼包【点击进入】" },
+        { url:"https://www.kdocs.cn/l/cs8uJiultNnW", urlText:"礼包介绍【点击进入】" },
+        { url:"https://www.kdocs.cn/l/ctxSSLJMd2PV", urlText:"次神新手攻略【点击进入】" },
+      ] },
+    ]
+  },
+  {
+    title:"向僵尸开炮", desc:"严格按照步骤操作", meta:"1 天前更新", fresh:false,
+    icon:"2.jpg",
+    rewards:[
+      { code:"BT924", desc:"奖励：钻石*399999,体力*18888,枪械图纸*8888， 装备图纸*2888,招募令*666,技能手册*10000,炫彩随机宝石*8,全系传说礼盒自选箱*3，全系绝世礼盒自选箱*3，沸腾盛宴*1" },
+      { code:"BT666、BT888、BT999", desc:"奖励：钻石255553，体力 17553，焕新试剂6666，温压弹传说礼盒 3，干冰弹传说礼盒3，装甲车传说礼盒 3，前哨佣兵礼盒6，璀璨宝箱钥匙 2553，初代奥特曼1，符文壁垒 1，赛季换新试剂888，电磁穿刺传说礼盒 3，制导激光传说礼盒3，高能射线传说礼盒 3，自由1，地心驱动 1，基因药剂1999，旋风加农传说礼盒 3，跃迁电子传说礼盒3，冰暴发生器传说礼盒 3，雷神1，防卫基地 1" },
+      { code:"BTMZFL【每间隔7天都可以兑换一次】", desc:"奖励：全系传说礼盒自选箱*1 钻石*8888、基因药剂*100、璀璨宝箱钥匙*888、全系传说礼盒自选箱*1" },
+      { code:"店铺收货好评大礼包", desc:"好评后找店铺客服领取，每天都可以领一次：奖励：钻石*1888、焕新试剂*300、紫色芯片随机宝箱*100" },
+      { code:"官方群公告礼包【每间隔30天都可以兑换一次】", desc:"群公告领取奖励:全系绝世礼盒自选箱*1 钻石*38888、通用资源自选箱*30、全系绝世礼盒自选箱*1" },
+    ],
+    groupUrl:"https://qm.qq.com/q/FbLDRdMNW0",
+    steps:[
+      { t:"注册账号", d:"点下面的按钮「注册账号记得保存以免忘记哦」。", url:"https://js.thecm8.com/?p=54574", urlText:"注册链接【点击进入】" }, 
+      { t:"下载游戏", d:"根据你的手机型号，下载对应版本的安装包并安装。", urls:[
+         { url:"https://tt.abcabc.uk/3mJc", urlText:"苹果下载地址【点击进入】" },
+         { url:"https://d.cnmcdn.uk", urlText:"安卓下载地址【点击进入】" },
+       ] },
+      { t:"礼包码兑换", d:"进链接输入注册账号选好区服，输入礼包码点领取即可。领完礼包没有到账重新进几次游戏刷新一下。", url:"https://jsbt.thecm8.com/index/cdk", urlText:"【点击按钮领取】" },
+      { t:"游戏充值礼包", d:"点击下面链接进入充值中心，领取专属充值返利礼包。", urls:[
+        { url:"https://js.thecm8.com/player/login", urlText:"充值礼包【点击进入】" },
+        { url:"https://jsbt.thecm8.com/index/reward", urlText:"今日累计礼包【点击进入】" },
+        { url:"https://jsbt.thecm8.com/player/item", urlText:"删除多余物品【点击进入】" },
+      ] },
+    ]
+  },
+   {
+    title:"百炼英雄", desc:"严格按照步骤操作", meta:"1 天前更新",fresh:false,
+    icon:"3.jpg",
+    rewards:[
+      { code:"BL111、BL222、BL333、BL444、BL555、BL666、BL777、BL888、BL999、BL1212", desc:"奖励：经验1000万、VIP经验*5万、金币*5万、绿钻*37443、紫钻代金*2500、肉块*18888、木材*8888、蓝矿石*3888、红矿石*50、英雄升星石*1000、英雄觉醒石*500、职业升星宝箱*100、淬炼石*50、幸运草*50、高级幸运草*30、超级幸运草*10、史诗随机英雄*1000、传说随机英雄自选卡*1000、神话随机英雄宝箱*800、神话英雄自选卡*600、天宫英雄随机宝箱*400、三国英雄随机宝箱*400、普通召唤卷50、高级召唤卷*20、超级召唤卷*10、红色随机守护兽*5、红色自选守护兽*2、普通召唤石*500、精英召唤石*300、噩梦召唤石*120、远古自选部位宝箱*2、90-100级传说装备随机宝箱*2、白色符文随机宝箱*30、蓝色符文随机宝箱*20、紫色符文随机宝箱*10、橙色符文随机宝箱*5、红色符文随机宝箱*2、赤龙·关羽皮肤*1、锅盔侠·布莱恩皮肤*1、护士长·玛利亚皮肤*1、鬼刃修罗·缘壹皮肤*1、赤焰女巫·莉娜皮肤*1" },
+      { code:"BLsheniandaji", desc:"奖励：紫钻代金*5000、金币*88888、众神之王·宙斯*800、圣女·贞德*800、英雄升星石*800" },
+      { code:"BL七夕快乐、BL马年大吉、BL欢度国庆", desc:"奖励：紫钻代金*5100、女神升星石*5100、女神进阶石*510、英雄升星石*3175、精炼石*800、职业升星石*51、绿钻*36665、肉块*77777、修复锤*7777、高级幸运草*777、超级幸运草*77、神话随机英雄宝箱*500、天宫英雄随机宝箱*500、三国英雄随机宝箱*500、精炼资源自选宝箱*10" },
+      { code:"店铺收货好评大礼包", desc:"奖励：紫钻代金*5000、金币*88888、众神之王·宙斯*800、圣女·贞德*800、英雄升星石*800" },
+    ],
+    groupUrl:"https://qm.qq.com/q/JCY4t1isc6",
+    steps:[
+      { t:"注册账号（注册码22）", d:"注册码填22「注册账号记得保存以免忘记哦」。", url:"https://ss.dstormrecords.com/index/user/login.html", urlText:"注册链接【点击进入】" },
+      { t:"下载游戏", d:"根据你的手机型号，下载对应版本的安装包并安装。", urls:[
+         { url:"https://bl.blyx2026.cyou", urlText:"苹果下载地址【点击进入】" },
+         { url:"https://tt.ppba.top/b3Nu", urlText:"安卓下载地址【点击进入】" },
+       ] },
+      { t:"礼包码兑换", d:"注册登录游戏后，人物达到5级在【更多-设置-兑换码】里把下面的兑换码依次复制粘贴进去。 " },
+      { t:"游戏充值礼包", d:"点击下面链接进入充值中心，领取专属充值返利礼包。", urls:[
+        { url:"https://ss.dstormrecords.com/index/user/login.html", urlText:"充值礼包【点击进入】" },
+        { url:"https://www.kdocs.cn/l/cf6bCJQXgfpa", urlText:"礼包介绍【点击进入】" },
+      ] },
+    ]
+  },
+   {
+    title:"弓箭传说2", desc:"严格按照步骤操作", meta:"1 天前更新",fresh:false,
+    icon:"4.jpg",
+    rewards:[
+      { code:"gi2888", desc:"50万钻石、武器强化道具100、护甲强化道具100、头盔强化道具100、戒指强化道具100、护符强化道具100、鞋强化道具100、大富翁头像框、紫色随机装备100、赛季装饰" },
+      { code:"gi220260619", desc:"10万钻石、随机强化道具100、金币100万、幻彩钥匙100" },
+      { code:"gi20260612", desc:"随机强化道具300、10万钻石、幻彩钥匙100" },
+      { code:"gi202677", desc:"随机强化道具300、10万钻石、幻彩钥匙100、紫色随机装备10 " },
+      { code:"gi202260601", desc:"10万钻石、随机强化道具100、金币100万、幻彩钥匙100" },
+      { code:"店铺好评大礼包", desc:"10万钻石、随机强化道具100、金币100万、幻彩钥匙100" },
+    ],
+    groupUrl:"https://qm.qq.com/q/fDgE2IGRR8",
+    steps:[
+      { t:"注册账号", d:"点下面的按钮「注册账号记得保存以免忘记哦」。", url:"http://101.133.143.162:8441/mobile/Downfile/index?gid=3&pid=6065", urlText:"注册链接【点击进入】" },
+      { t:"下载游戏", d:"根据你的手机型号，下载对应版本的安装包并安装。", urls:[
+         { url:"https://tt.abcabc.uk/UW2F", urlText:"①安卓/苹果下载地址【点击进入】" },
+         { url:"https://https://37wan.uk/moSP", urlText:"②安卓/苹果下载地址【点击进入】" },
+       ] },
+      { t:"礼包码兑换", d:"进入游戏后，在【设置-兑换码】里把下面的兑换码依次复制粘贴进去。" },
+      { t:"游戏充值礼包", d:"点击下面链接进入充值中心，领取专属充值返利礼包，6R=9000代金券。", urls:[
+        { url:"http://101.133.143.162:8440", urlText:"充值礼包【点击进入】" },
+        { url:"https://www.kdocs.cn/l/ccV2FwU3yJ32", urlText:"礼包介绍【点击进入】" },
+      ] },
+    ]
+  },
+  {
+    title:"梦幻手游西游", desc:"严格按照步骤操作", meta:"1 天前更新",fresh:false,
+    icon:"5.jpg",
+    rewards:[
+      { code:"VIP666", desc:"坐骑盲盒 ×5、锦衣盲盒 ×5、特殊兽决自选礼包 ×1、技能领悟丹 ×1、70级简易装备 ×1套、银币 ×10亿" },
+      { code:"VIP888", desc:"青龙石 ×50、白虎石 ×50、朱雀石 ×50、玄武石 ×50、高级藏宝图 ×5、金柳露 ×99、吉祥锦囊 ×9银币 ×10亿" },
+      { code:"首次上线自动到账", desc:"吉里吉里/咕噜咕噜珍兽6技能" },
+    ],
+    groupUrl:"https://qm.qq.com/q/ubQmA7aJry",
+    steps:[
+      { t:"注册账号下载游戏", d:"点下面的按钮「注册账号密码记得保存以免忘记哦」。", url:"https://ycx.rmrxp.cn/?invite_code=E4FLQL", urlText:"游戏网页【点击进入】" },
+      { t:"礼包码兑换", d:"进入游戏后，角色达到 69 级后可兑换；VIP666、VIP888 每个角色各限领一次。" },
+      { t:"游戏充值礼包", d:"充值比例1:2000点击下面链接查看完整充值福利，领取专属充值返利礼包。", urls:[
+        { url:"https://www.kdocs.cn/l/cfgBPq7AIdD2", urlText:"礼包介绍【点击进入】" },
+      ] },
+    ]
+  },
+  {
+    title:"超能下蛋鸭", desc:"严格按照步骤操作", meta:"1 天前更新",fresh:false,
+    icon:"6.jpg",
+    rewards:[
+      { code:"CN666", desc:"奖励：钻石×66666、神王蛋×66、限时召唤卷×66、高级幻兽卷×33、SSS级卡片包×1" },
+      { code:"CN777", desc:"奖励：金币×77w、骨头×7w、精铁锤×77、宝石铲×77、玫瑰×777" },
+      { code:"CN888", desc:"奖励：奖励：闪金券×1888(代金)、启灵星×88888、强化石×18888、胶囊×88、特级许可证×88" },
+      { code:"hmxdy666【每日领1次】", desc:"奖励：闪金券×388、钻石×666、体力×100、骨头×6666、强化石×666" },
+      { code:"店铺好评大礼包【每周领一次】", desc:"找店铺客服领取奖励：闪金券×3888、钻石×5888、胶囊×28、宝石铲×38、精铁锤×58" },
+      { code:"官方公告大礼包【每月领一次】", desc:"添加交流群客服领取奖励：闪金券*12888【代金】、钻石*18888、限时召唤卷*66、XR级怪物球*6、特级幻兽券*6。加每个节日新礼包码＋版本更新通知。" },
+    ],
+    groupUrl:"https://qm.qq.com/q/qfOM2bOeFW",
+    steps:[
+      { t:"注册账号", d:"点下面的按钮注册时「安全码」用于修改密码记得保存以免忘记哦。", url:"http://newxiadan.3f8cz.com/?p=10377", urlText:"注册链接【点击进入】" },
+      { t:"下载游戏", d:"根据你的手机型号，下载对应版本的安装包并安装。", urls:[
+         { url:"http://newxiadan.3f8cz.com/?p=10377", urlText:"苹果/安卓通用下载地址【点击进入】" },
+         { url:"https://www.kdocs.cn/l/cuAHLUVk9tFK", urlText:"登录不上游戏解决方法【点击进入】" },
+       ] },
+      { t:"礼包码兑换", d:"打开游戏网页后，在【CDK兑换】里把下面的兑换码依次复制粘贴进去。", url:"http://newxiadan.3f8cz.com/index/cdk", urlText:"兑换链接【点击进入】" }, 
+      { t:"游戏充值礼包", d:"额外免费礼包在充值链接里面每天拿188闪金券。其他礼包需要买平台币后用平台币抵扣。。", urls:[
+        { url:"https://newxiadan.3f8cz.com/player/login", urlText:"充值礼包【点击进入】" },
+        { url:"http://newxiadan.3f8cz.com/index/reward", urlText:"每日累计/总累计充值奖励【点击进入】" },
+        { url:"https://newxiadan.3f8cz.com/index/card", urlText:"周卡/月卡/季卡领取奖励【点击进入】" },
+        { url:"https://www.kdocs.cn/l/ciwzTi2K0yoH", urlText:"转区规则【点击进入】" },
+      ] },
+    ]
+  },
+];
+
+/* 跑马灯字幕（★在这里改） */
+const TICKER_ITEMS = ["免下载","免注册","共 20 款游戏","近 3 天更新 6 款","礼包码持续更新","跟着步骤一键领取"];
+
+/* ============================================================
+   下面是逻辑，一般不用动
+   ============================================================ */
+const listEl = document.getElementById('gameList');
+const emptyBox = document.getElementById('emptyBox');
+const viewHome = document.getElementById('viewHome');
+const viewDetail = document.getElementById('viewDetail');
+let filter = "";
+
+function iconInner(g){
+  return g.icon ? `<img src="${g.icon}" alt="">` : `<span>${g.title.replace(/[·\s]/g,'').charAt(0)}</span>`;
+}
+
+function renderList(){
+  const items = GAMES.filter(g=>g.title.toLowerCase().includes(filter));
+  listEl.innerHTML = '';
+  items.forEach((g,i)=>{
+    const realIdx = GAMES.indexOf(g);
+    const li = document.createElement('li');
+    li.className = 'game-item' + (g.fresh ? ' is-fresh' : '');
+    li.innerHTML = `
+      <div class="game-icon-wrap">${iconInner(g)}</div>
+      <div class="game-info">
+        <h3 class="game-title">${g.title}</h3>
+        <p class="game-desc">${g.desc}</p>
+        <div class="game-meta">${g.meta}</div>
+      </div>
+      <a class="btn-play">立即游玩</a>`;
+    li.addEventListener('click', ()=>location.hash = '#/game/' + realIdx);
+    listEl.appendChild(li);
+  });
+  emptyBox.style.display = items.length ? 'none' : 'block';
+  document.getElementById('countText').textContent = '共 ' + items.length + ' 款游戏';
+  document.getElementById('totalNum').textContent = GAMES.length;
+}
+renderList();
+
+/* 跑马灯 */
+const tickerTrack = document.getElementById('tickerTrack');
+const tickerHtml = TICKER_ITEMS.map(t=>`<span><i>·</i>${t}<i>·</i></span>`).join('');
+tickerTrack.innerHTML = tickerHtml + tickerHtml;
+
+/* 搜索 */
+document.getElementById('searchInput').addEventListener('input', e=>{
+  filter = e.target.value.trim().toLowerCase();
+  renderList();
+});
+
+/* 详情页填充 */
+function openDetail(idx){
+  const g = GAMES[idx];
+  if(!g) return showHome();
+  document.getElementById('dIcon').innerHTML = iconInner(g);
+  document.getElementById('dName').textContent = g.title;
+  document.getElementById('dMeta').textContent = g.meta;
+  document.getElementById('dStart').href = g.groupUrl || '#/';
+  const stepsEl = document.getElementById('dSteps');
+  const CN = ['一','二','三','四','五','六','七','八'];
+  stepsEl.innerHTML = (g.steps||[]).map((s,i)=>`
+    <article class="step-card${i===0?' active':''}">
+      <div class="card-header" onclick="toggleStep(this)">
+        <div class="header-title"><span class="step-badge">步骤${CN[i]||(i+1)}</span>${s.t}</div>
+        <div class="arrow-icon"></div>
+      </div>
+      <div class="card-content"><div class="content-inner">
+        <p>${s.d}</p>
+        ${(s.urls||[]).map(u=>`<a class="step-link" href="${u.url}" target="_blank" rel="noopener">${u.urlText||'点击进入'} →</a>`).join('')}
+        ${s.url ? `<a class="step-link" href="${s.url}" target="_blank" rel="noopener">${s.urlText||'点击进入'} →</a>` : ''}
+      </div></div>
+    </article>`).join('');
+  // 把礼包码列表追加到标题含"礼包码"的那一步
+  if(g.rewards && g.rewards.length){
+    let targetContent = null;
+    stepsEl.querySelectorAll('.step-card').forEach(card=>{
+      if(card.querySelector('.header-title').textContent.includes('礼包码')){
+        targetContent = card.querySelector('.content-inner');
+      }
+    });
+    // 找不到就退回到最后一步
+    if(!targetContent) targetContent = stepsEl.querySelector('.step-card:last-child .content-inner');
+    if(targetContent){
+      targetContent.insertAdjacentHTML('beforeend',
+        '<div class="reward-list">'+
+        g.rewards.map(r=>`
+          <div class="reward-item">
+            <button class="reward-code-btn" data-code="${r.code}">${r.code}</button>
+            <span class="reward-desc">${r.desc||''}</span>
+          </div>`).join('')+
+        '</div>');
+    }
+  }
+  // 初始化第一张展开的高度
+  requestAnimationFrame(()=>{
+    const first = stepsEl.querySelector('.step-card.active .card-content');
+    if(first) first.style.maxHeight = first.scrollHeight + 'px';
+  });
+  viewHome.classList.remove('active');
+  viewDetail.classList.add('active');
+  window.scrollTo({top:0});
+}
+/* 手风琴：点哪张展开哪张，其余收起 */
+function toggleStep(headerEl){
+  const card = headerEl.parentElement;
+  const content = card.querySelector('.card-content');
+  const opening = !card.classList.contains('active');
+  // 先收起其他卡片
+  document.querySelectorAll('#dSteps .step-card.active').forEach(c=>{
+    if(c!==card){ c.classList.remove('active'); c.querySelector('.card-content').style.maxHeight='0px'; }
+  });
+  if(opening){
+    card.classList.add('active');
+    content.style.maxHeight = content.scrollHeight + 'px';
+  }else{
+    card.classList.remove('active');
+    content.style.maxHeight = '0px';
+  }
+}
+function showHome(){
+  viewDetail.classList.remove('active');
+  viewHome.classList.add('active');
+}
+document.getElementById('backBtn').addEventListener('click', ()=>location.hash = '#/');
+document.getElementById('brandLink').addEventListener('click', e=>{e.preventDefault();location.hash='#/';});
+document.getElementById('tabCodes').addEventListener('click', e=>{e.preventDefault();location.hash='#/';});
+
+/* 点礼包码按钮复制（事件委托） */
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('.reward-code-btn');
+  if(!btn) return;
+  const code = btn.dataset.code;
+  navigator.clipboard && navigator.clipboard.writeText(code);
+  const old = btn.textContent;
+  btn.textContent = '已复制 ✓'; btn.classList.add('copied');
+  setTimeout(()=>{btn.textContent=old;btn.classList.remove('copied');},1500);
+});
+
+/* hash 路由 */
+function route(){
+  const m = location.hash.match(/^#\/game\/(\d+)/);
+  if(m) openDetail(parseInt(m[1],10)); else showHome();
+}
+window.addEventListener('hashchange', route);
+route();
+
+/* 主题切换 & 回顶部 */
+document.getElementById('themeBtn').addEventListener('click', ()=>document.documentElement.classList.toggle('dark-mode'));
+document.getElementById('topBtn').addEventListener('click', ()=>window.scrollTo({top:0,behavior:'smooth'}));
+</script>
+</body>
+</html>
