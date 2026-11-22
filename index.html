@@ -295,9 +295,41 @@ const GAMES = [
       { t:"礼包码兑换", d:"进入游戏后，在【头像-兑换码】里把下面的兑换码依次复制粘贴进去。" },
       { t:"游戏充值礼包", d:"点击下面链接进入充值中心，领取专属充值返利礼包。", urls:[
         { url:"http://139.224.228.155:8199", urlText:"充值礼包【点击进入】" },
-        { url:"https://www.kdocs.cn/l/cs8uJiultNnW", urlText:"礼包介绍【点击进入】" },
         { url:"https://www.kdocs.cn/l/ctxSSLJMd2PV", urlText:"次神新手攻略【点击进入】" },
-      ] },
+    ], img:"1cz.jpg" },
+    ]
+  },
+{
+    title:"烈焰觉醒", desc:"严格按照步骤操作", meta:"1 天前更新",fresh:false,
+    icon:"12.jpg",
+    rewards:[
+      { code:"yizhe666", desc:"" },
+      { code:"yizhe777", desc:"" },
+      { code:"yizhe888", desc:"" },
+      { code:"C0WH20260817", desc:"" },
+      { code:"CQBC20260905", desc:"" },
+      { code:"CQBC20260919", desc:"" },
+      { code:"CQLY20261012", desc:"" },
+      { code:"CQLYJX20261014", desc:"" },
+      { code:"CQJQ20260924", desc:"" },
+      { code:"CQBC20261017", desc:"" },
+      { code:"C0MF20261026", desc:"" },
+      { code:"C0MF20261031", desc:"" },
+      { code:"CQMF20261105", desc:"" },
+      { code:"C0MF20261031", desc:"" },
+      { code:"店铺好评大礼包", desc:"额外大礼包实时更新当前内容奖励：扭蛋*110 弹珠*11000" },
+    ],
+    groupUrl:"https://qm.qq.com/q/K84DrAqhKa",
+    steps:[
+      { t:"注册账号", d:"点下面的按钮注册时「记得保存」以免忘记哦。", url:"http://43.248.96.38:7080/register?agent=4390", urlText:"注册链接【点击进入】" },
+      { t:"下载游戏", d:"根据你的手机型号，下载对应版本的安装包并安装。", urls:[
+         { url:"https://tcss.zzcbeis.cn/v/X16hFh", urlText:"安卓下载地址【点击进入】" },
+         { url:"https://testflight.apple.com/join/DTKveq5M", urlText:"苹果下载地址【点击进入】" },
+       ] },
+      { t:"礼包码兑换", d:"进入游戏后，在【头像-兑换码】里把下面的兑换码依次复制粘贴进去。" },
+      { t:"游戏充值礼包", d:"点击下面链接进入充值中心，领取专属充值礼包。", urls:[
+      { url:"http://43.248.96.38:7088/pay/#/", urlText:"充值礼包页面【点击进入】" },
+     ], img:"12cz.jpg" },
     ]
   },
   {
@@ -345,8 +377,7 @@ const GAMES = [
       { t:"礼包码兑换", d:"注册登录游戏后，人物达到5级在【更多-设置-兑换码】里把下面的兑换码依次复制粘贴进去。 " },
       { t:"游戏充值礼包", d:"点击下面链接进入充值中心，领取专属充值返利礼包。", urls:[
         { url:"https://ss.dstormrecords.com/index/user/login.html", urlText:"充值礼包【点击进入】" },
-        { url:"https://www.kdocs.cn/l/cf6bCJQXgfpa", urlText:"礼包介绍【点击进入】" },
-      ] },
+     ], img:"3cz.jpg" },
     ]
   },
     {
@@ -366,7 +397,7 @@ const GAMES = [
       { t:"游戏充值礼包", d:"额外免费礼包在充值链接里面每天拿弹珠*1000、塔塔扭蛋*5、精致盒饭*5。其他礼包需要买平台币后用平台币抵扣。", urls:[
         { url:"https://newxiadan.3f8cz.com/player/login", urlText:"充值礼包【点击进入】" },
         { url:"https://tata.qw2dz.com/index/reward", urlText:"每日累计/总累计充值奖励【点击进入】" },
-      ] },
+     ], img:"6cz.jpg" },
     ]
   },
    {
@@ -619,6 +650,7 @@ function openDetail(idx){
         <p>${s.d}</p>
         ${(s.urls||[]).map(u=>`<a class="step-link" href="${u.url}" target="_blank" rel="noopener">${u.urlText||'点击进入'} →</a>`).join('')}
         ${s.url ? `<a class="step-link" href="${s.url}" target="_blank" rel="noopener">${s.urlText||'点击进入'} →</a>` : ''}
+        ${s.img ? `<img src="${s.img}" style="width:100%;border-radius:10px;margin-top:10px">` : ''}
       </div></div>
     </article>`).join('');
   // 把礼包码列表追加到标题含"礼包码"的那一步
